@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Store</title>
+
+<style>
+body{
+font-family:Arial;
+background:#f5f5f5;
+padding:40px
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px
+}
+
+button{
+background:black;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>Store</h1>
+
+<div id="products" class="grid"></div>
+
+<script>
+
+async function load(){
+
+const r = await fetch("/api/products")
+const products = await r.json()
+
+const el = document.getElementById("products")
+
+products.forEach(p=>{
+
+const card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+<img src="${p.image}" width="100%">
+<h3>${p.name}</h3>
+<p>€${p.price}</p>
+<button onclick="buy('${p.name}',${p.price})">Buy</button>
+`
+
+el.appendChild(card)
+
+})
+
+}
+
+async function buy(name,price){
+
+const r = await fetch("/api/checkout",{
+method:"POST",
+headers:{ "Content-Type":"application/json" },
+body:JSON.stringify({name,price})
+})
+
+const d = await r.json()
+
+window.location = d.url
+
+}
+
+load()
+
+</script>
+
+</body>
+</html>
